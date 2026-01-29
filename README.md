@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="assets/looptech-logo.png" alt="LoopTech" width="200">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/looptech-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/looptech-logo.png">
+    <img src="assets/looptech-logo.png" alt="LoopTech" width="300">
+  </picture>
 </p>
 
 <h1 align="center">PPTX Viewer</h1>
@@ -499,7 +503,12 @@ pptx-viewer/
 ---
 
 <p align="center">
-  <img src="assets/looptech-logo.png" alt="LoopTech" width="120"><br>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/looptech-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/looptech-logo.png">
+    <img src="assets/looptech-logo.png" alt="LoopTech" width="150">
+  </picture>
+  <br>
   <strong>LoopTech Labs</strong><br>
-  <em>Exploring ideas, building prototypes</em>
+  <em>Exploring ideas, building proofs of concept</em>
 </p>
