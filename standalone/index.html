@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PPTX Viewer - Standalone</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { margin-bottom: 8px; color: #333; }
+    .subtitle { color: #666; margin-bottom: 24px; }
+    .upload-zone {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+      margin-bottom: 24px;
+    }
+    .upload-zone:hover { border-color: #0066cc; background: #f8fafc; }
+    .upload-zone.dragging { border-color: #0066cc; background: #e6f2ff; }
+    .upload-zone input { display: none; }
+    .upload-zone p { color: #666; margin-bottom: 8px; }
+    .upload-zone .hint { font-size: 0.875rem; color: #999; }
+    .file-info {
+      background: #e6f2ff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    .file-info h3 { font-size: 1rem; margin-bottom: 4px; }
+    .file-info p { font-size: 0.875rem; color: #666; }
+    .viewer-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-height: 600px;
+      overflow: hidden;
+    }
+    #pptx-wrapper {
+      width: 100%;
+      min-height: 500px;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      flex-direction: column;
+      gap: 16px;
+      color: #666;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #eee;
+      border-top-color: #0066cc;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 400px;
+      color: #999;
+    }
+    .error {
+      background: #fff5f5;
+      border: 1px solid #ffcdd2;
+      color: #c62828;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PPTX Viewer - Standalone</h1>
+    <p class="subtitle">Pure JavaScript viewer using pptx-preview (no server required)</p>
+
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept=".pptx">
+      <p>Drop a PowerPoint file here or click to browse</p>
+      <span class="hint">Supports .pptx files only</span>
+    </div>
+
+    <div class="file-info" id="fileInfo" style="display: none;">
+      <h3 id="fileName"></h3>
+      <p id="fileSize"></p>
+    </div>
+
+    <div class="viewer-container">
+      <div class="placeholder" id="placeholder">
+        Upload a PowerPoint file to view it
+      </div>
+      <div class="loading" id="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Rendering slides...</p>
+      </div>
+      <div id="pptx-wrapper" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import pptx-preview from ESM CDN
+    import { init } from 'https://esm.sh/pptx-preview@1.0.7';
+
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const placeholder = document.getElementById('placeholder');
+    const loading = document.getElementById('loading');
+    const pptxWrapper = document.getElementById('pptx-wrapper');
+
+    // Initialize the previewer
+    const pptxPreviewer = init(pptxWrapper, {
+      width: 960,
+      height: 540
+    });
+
+    // Click to upload
+    uploadZone.addEventListener('click', () => fileInput.click());
+
+    // Drag and drop
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragging');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragging');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragging');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handleFile(file);
+    });
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    async function handleFile(file) {
+      // Show file info
+      fileName.textContent = file.name;
+      fileSize.textContent = 'Size: ' + formatSize(file.size);
+      fileInfo.style.display = 'block';
+
+      // Show loading
+      placeholder.style.display = 'none';
+      loading.style.display = 'flex';
+      pptxWrapper.style.display = 'none';
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+
+        // Render using pptx-preview
+        await pptxPreviewer.preview(arrayBuffer);
+
+        loading.style.display = 'none';
+        pptxWrapper.style.display = 'block';
+      } catch (err) {
+        console.error('Error rendering PPTX:', err);
+        loading.style.display = 'none';
+        pptxWrapper.innerHTML = `
+          <div class="error">
+            <strong>Error rendering file:</strong> ${err.message}
+          </div>
+        `;
+        pptxWrapper.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

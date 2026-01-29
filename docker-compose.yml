@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # ONLYOFFICE Document Server
+  onlyoffice:
+    image: onlyoffice/documentserver:latest
+    container_name: onlyoffice
+    ports:
+      - "8080:80"
+    environment:
+      - JWT_ENABLED=false  # Disable JWT for local dev (enable in production!)
+    volumes:
+      - onlyoffice_data:/var/www/onlyoffice/Data
+    restart: unless-stopped
+
+  # Collabora Online (CODE - Development Edition)
+  collabora:
+    image: collabora/code:latest
+    container_name: collabora
+    ports:
+      - "9980:9980"
+    environment:
+      - domain=localhost:5173  # Allow our frontend
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=false
+      - username=admin
+      - password=admin
+    cap_add:
+      - MKNOD
+    restart: unless-stopped
+
+  # Backend API for file storage
+  backend:
+    build: ./backend
+    container_name: pptx-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./uploads:/app/uploads
+    environment:
+      - ONLYOFFICE_URL=http://onlyoffice
+      - COLLABORA_URL=http://collabora:9980
+    depends_on:
+      - onlyoffice
+      - collabora
+
+volumes:
+  onlyoffice_data:
