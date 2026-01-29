@@ -1,10 +1,19 @@
-# PPTX Viewer Prototype
+<p align="center">
+  <img src="assets/looptech-logo.png" alt="LoopTech" width="200">
+</p>
 
-A self-hosted solution for viewing PowerPoint presentations in the browser using ONLYOFFICE or Collabora Online.
+<h1 align="center">PPTX Viewer</h1>
+
+<p align="center">
+  <strong>A LoopTech Labs Proof of Concept</strong><br>
+  Self-hosted PowerPoint viewing using ONLYOFFICE or Collabora Online
+</p>
+
+---
 
 ## Overview
 
-This prototype demonstrates how to upload and display PowerPoint files (.pptx) in a web application with high fidelity rendering, without sending data to external services.
+This project demonstrates how to upload and display PowerPoint files (.pptx) in a web application with high fidelity rendering, without sending data to external services.
 
 ### Key Features
 
@@ -12,6 +21,24 @@ This prototype demonstrates how to upload and display PowerPoint files (.pptx) i
 - **Self-hosted** - All data stays on your infrastructure
 - **Two viewer options** - ONLYOFFICE (best compatibility) and Collabora Online (LibreOffice-based)
 - **No external dependencies** - Everything runs locally via Docker
+
+### Limitations
+
+Both ONLYOFFICE and Collabora render presentations as **static slides**. The following features are **not supported**:
+
+| Feature | ONLYOFFICE | Collabora | Notes |
+|---------|------------|-----------|-------|
+| Embedded videos | ❌ | ❌ | Shows placeholder/thumbnail only |
+| Video playback | ❌ | ❌ | No playback capability |
+| Animations | ❌ | ❌ | Slides render in final state |
+| Transitions | ⚠️ Limited | ⚠️ Limited | Basic only |
+| Embedded audio | ❌ | ❌ | No playback |
+| Narration | ❌ | ❌ | Not supported |
+
+**If you need multimedia playback**, consider:
+- Microsoft's embed viewer (requires SharePoint/public URLs, sends data to Microsoft)
+- Google Slides import (converts PPTX, may lose fidelity)
+- Custom player that extracts media from PPTX and plays alongside slides
 
 ## Quick Start
 
@@ -301,6 +328,7 @@ docker exec onlyoffice curl -I "http://host.docker.internal:3001/files/test.pptx
 | Startup Time | ~30s | ~20s |
 | Edit Support | Yes | Yes |
 | Animations | No | No |
+| Video/Audio | No | No |
 
 ## Troubleshooting
 
@@ -344,7 +372,7 @@ app.use(cors({
 ## Project Structure
 
 ```
-pptx-viewer-prototype/
+pptx-viewer/
 ├── README.md                 # This file
 ├── docker-compose.yml        # Docker setup for all services
 ├── backend/                  # Express API server
@@ -361,3 +389,11 @@ pptx-viewer-prototype/
 
 - ONLYOFFICE Community Edition: AGPL 3.0
 - Collabora CODE: MPL 2.0
+
+---
+
+<p align="center">
+  <img src="assets/looptech-logo.png" alt="LoopTech" width="120"><br>
+  <strong>LoopTech Labs</strong><br>
+  <em>Exploring ideas, building prototypes</em>
+</p>

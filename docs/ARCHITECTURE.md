@@ -1,6 +1,23 @@
 # Enterprise Architecture Guide
 
+<p align="center">
+  <strong>LoopTech Labs | PPTX Viewer</strong>
+</p>
+
+---
+
 This document outlines how to deploy the PPTX Viewer system for enterprise or customer-facing applications.
+
+## Limitations
+
+Before proceeding, note that both ONLYOFFICE and Collabora render presentations as **static slides**. The following are **not supported**:
+
+- **Embedded videos** - Shows placeholder only, no playback
+- **Animations** - Slides render in final state
+- **Transitions** - Basic support only
+- **Audio/Narration** - Not supported
+
+If your use case requires multimedia playback, consider Microsoft's embed viewer or a custom solution that extracts and plays media separately.
 
 ## Table of Contents
 
